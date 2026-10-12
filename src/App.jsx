@@ -278,6 +278,16 @@ function ProjectEmail() {
 }
 
 function ProjectSocial() {
+  const [sampleType, setSampleType] = useState("canva");
+  const isCanva = sampleType === "canva";
+  const samples = [1, 2, 3, 4].map((number) => ({
+    src: isCanva ? `/${number}.png` : `/social-media-sample/${number}.png`,
+    alt: isCanva
+      ? `Canva promotional graphic design sample ${number}`
+      : `Social media content design sample ${number}`,
+    label: `${isCanva ? "Canva design" : "Social media sample"} ${String(number).padStart(2, "0")}`,
+  }));
+
   return (
     <>
       <div className="project-copy">
@@ -287,10 +297,23 @@ function ProjectSocial() {
         <ul className="skill-tags"><li>Canva</li><li>Graphic design</li><li>Content planning</li><li>Visual communication</li></ul>
         <p className="project-note">Personal demonstration work. Featured brands and offers are fictional.</p>
       </div>
-      <div className="gallery-grid">
-        {[1, 2, 3, 4].map((number) => (
-          <figure key={number}><img src={`/${number}.png`} alt={`Promotional graphic design sample ${number}`} loading="lazy" /><figcaption>Design {String(number).padStart(2, "0")}</figcaption></figure>
-        ))}
+      <div className="sample-gallery">
+        <div className="gallery-switch" aria-label="Choose a sample gallery">
+          <button type="button" className={isCanva ? "is-active" : ""} aria-pressed={isCanva} onClick={() => setSampleType("canva")}>
+            Canva designs <span>04</span>
+          </button>
+          <button type="button" className={!isCanva ? "is-active" : ""} aria-pressed={!isCanva} onClick={() => setSampleType("social")}>
+            Social media samples <span>04</span>
+          </button>
+        </div>
+        <div className={`gallery-grid${isCanva ? "" : " gallery-grid-social"}`} key={sampleType}>
+          {samples.map((sample) => (
+            <figure key={sample.src}>
+              <img src={sample.src} alt={sample.alt} loading="lazy" />
+              <figcaption>{sample.label}</figcaption>
+            </figure>
+          ))}
+        </div>
       </div>
     </>
   );
@@ -473,7 +496,7 @@ export default function App() {
               <ul className="hero-notes" aria-label="Quick details"><li>Philippines-based</li><li>Available remotely</li><li>Privacy-conscious</li></ul>
             </div>
             <div className="hero-visual reveal">
-              <div className="hero-image-frame"><img src="/jadr-photos/1.png" alt="Jadr Panes seated on outdoor steps" /></div>
+              <div className="hero-image-frame"><img src="/jadr-photos/3.png" alt="Jadr Panes seated on outdoor steps" /></div>
               <div className="hero-stamp" aria-hidden="true"><span>Organized</span><strong>Ready</strong><span>Responsive</span></div>
               <div className="availability-card"><span className="status-dot" /><p><small>Current status</small><strong>Open to remote opportunities</strong></p></div>
             </div>

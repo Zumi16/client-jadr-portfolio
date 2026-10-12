@@ -190,12 +190,19 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .priority { width: 7px; height: 7px; border-radius: 50%; }
 .priority.red { background: #fa4b4b; }.priority.orange { background: #ff9b3e; }.priority.blue { background: var(--blue); }.priority.green { background: #38b76c; }
 .project-panel-gallery { grid-template-columns: .55fr 1.45fr; }
-.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: center; }
+.sample-gallery { align-self: center; min-width: 0; }
+.gallery-switch { display: flex; gap: 8px; margin-bottom: 28px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.gallery-switch button { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 15px; border: 1px solid var(--line); border-radius: 999px; background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.gallery-switch button span { color: var(--pink); font-family: var(--serif); font-size: 14px; font-style: italic; font-weight: 400; }
+.gallery-switch button.is-active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.gallery-switch button.is-active span { color: var(--acid); }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: center; animation: panel-in .35s ease both; }
 .gallery-grid figure { margin: 0; transition: transform .25s; }
 .gallery-grid figure:nth-child(even) { transform: translateY(25px); }
 .gallery-grid figure:hover { transform: translateY(-5px); }
 .gallery-grid figure:nth-child(even):hover { transform: translateY(18px); }
 .gallery-grid img { aspect-ratio: .72; object-fit: cover; }
+.gallery-grid-social img { aspect-ratio: .8; object-position: top; }
 .gallery-grid figcaption { margin-top: 7px; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; }
 
 .process-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 9vw; }
@@ -352,6 +359,8 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
   .inbox-sidebar { display: none; }
   .inbox-mockup { display: block; }
   .gallery-grid { gap: 7px; }
+  .gallery-switch { display: grid; grid-template-columns: 1fr 1fr; }
+  .gallery-switch button { gap: 8px; padding-inline: 12px; }
   .tool-groups { grid-template-columns: 1fr; }
   .tool-groups article { min-height: auto; }
   .form-row { grid-template-columns: 1fr; gap: 0; }
