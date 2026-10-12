@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const navItems = [
   ["About", "about"],
@@ -279,6 +280,8 @@ function ProjectEmail() {
 
 function ProjectSocial() {
   const [sampleType, setSampleType] = useState("canva");
+  const [activeImage, setActiveImage] = useState(null);
+  const closeButtonRef = useRef(null);
   const isCanva = sampleType === "canva";
   const samples = [1, 2, 3, 4].map((number) => ({
     src: isCanva ? `/${number}.png` : `/social-media-sample/${number}.png`,
@@ -287,6 +290,33 @@ function ProjectSocial() {
       : `Social media content design sample ${number}`,
     label: `${isCanva ? "Canva design" : "Social media sample"} ${String(number).padStart(2, "0")}`,
   }));
+
+  useEffect(() => {
+    if (activeImage === null) return undefined;
+    const previousFocus = document.activeElement;
+    document.body.classList.add("lightbox-open");
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setActiveImage(null);
+      if (event.key === "Tab") {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.classList.remove("lightbox-open");
+      window.removeEventListener("keydown", handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, [activeImage]);
+
+  function changeSampleType(type) {
+    setActiveImage(null);
+    setSampleType(type);
+  }
 
   return (
     <>
@@ -299,22 +329,32 @@ function ProjectSocial() {
       </div>
       <div className="sample-gallery">
         <div className="gallery-switch" aria-label="Choose a sample gallery">
-          <button type="button" className={isCanva ? "is-active" : ""} aria-pressed={isCanva} onClick={() => setSampleType("canva")}>
+          <button type="button" className={isCanva ? "is-active" : ""} aria-pressed={isCanva} onClick={() => changeSampleType("canva")}>
             Canva designs <span>04</span>
           </button>
-          <button type="button" className={!isCanva ? "is-active" : ""} aria-pressed={!isCanva} onClick={() => setSampleType("social")}>
+          <button type="button" className={!isCanva ? "is-active" : ""} aria-pressed={!isCanva} onClick={() => changeSampleType("social")}>
             Social media samples <span>04</span>
           </button>
         </div>
         <div className={`gallery-grid${isCanva ? "" : " gallery-grid-social"}`} key={sampleType}>
           {samples.map((sample) => (
             <figure key={sample.src}>
-              <img src={sample.src} alt={sample.alt} loading="lazy" />
+              <button className="gallery-image-button" type="button" onClick={() => setActiveImage(samples.indexOf(sample))} aria-label={`Enlarge ${sample.label}`}>
+                <img src={sample.src} alt={sample.alt} loading="lazy" />
+                <span className="zoom-hint" aria-hidden="true">View ↗</span>
+              </button>
               <figcaption>{sample.label}</figcaption>
             </figure>
           ))}
         </div>
       </div>
+      {activeImage !== null && createPortal(
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label={`${samples[activeImage].label} enlarged`} onClick={(event) => { if (event.target === event.currentTarget) setActiveImage(null); }}>
+          <button ref={closeButtonRef} className="lightbox-close" type="button" onClick={() => setActiveImage(null)} aria-label="Close enlarged image">×</button>
+          <img className="lightbox-image" src={samples[activeImage].src} alt={samples[activeImage].alt} />
+        </div>,
+        document.body,
+      )}
     </>
   );
 }
