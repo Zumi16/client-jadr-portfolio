@@ -55,7 +55,7 @@ const processSteps = [
 
 const tools = [
   ["Administrative", "Data Entry", "Documentation", "Email Management", "Administrative Support"],
-  ["Customer", "Customer Service", "Issue Resolution", "Account Support", "Communication"],
+  ["Customer Support", "Customer Service", "Issue Resolution", "Account Support", "Communication"],
   ["Digital", "Canva", "Social Media", "Content Creation", "CRM"],
   ["Creative", "FL Studio", "Audio Editing", "Audio Mixing", "Music Production"],
 ];
@@ -148,7 +148,7 @@ function SectionHeading({ number, title, emphasis, text, className = "", heading
   return (
     <div className={`section-heading reveal ${className}`}>
       <p className="section-number">{number}</p>
-      <h2 id={headingId}>{title} <em>{emphasis}</em></h2>
+      <h2 id={headingId}>{title}{emphasis && <> <em>{emphasis}</em></>}</h2>
       {text && <p>{text}</p>}
     </div>
   );
@@ -159,8 +159,8 @@ function Services() {
     <section className="services section-cream" id="services" aria-labelledby="services-title">
       <div className="page-shell">
         <div className="section-heading reveal">
-          <p className="section-number">02 / Services</p>
-          <h2 id="services-title">How I can support <em>your business.</em></h2>
+          <p className="section-number">04 / Services</p>
+          <h2 id="services-title">How I can support <em>your business</em></h2>
           <p>Choose focused help for one workflow or combine services into consistent day-to-day support.</p>
         </div>
         <div className="service-list">
@@ -182,13 +182,13 @@ function Experience() {
     <section className="experience section-dark" id="experience" aria-labelledby="experience-title">
       <div className="page-shell experience-grid">
         <div className="experience-heading reveal">
-          <p className="section-number">03 / Experience</p>
-          <h2 id="experience-title">My professional <em>journey.</em></h2>
+          <p className="section-number">06 / Experience</p>
+          <h2 id="experience-title">My Professional <em>Journey</em></h2>
           <p>Customer-focused roles where good communication and accurate documentation matter every day.</p>
         </div>
         <div className="timeline">
           <article className="timeline-item reveal">
-            <div className="timeline-meta"><time>2026 — Present</time><span>Automotive</span></div>
+            <div className="timeline-meta"><time>2026 — Present</time><span>Automotive Case Management</span></div>
             <div>
               <h3>Case Manager</h3>
               <p className="company">Teleperformance · Stellantis FCA</p>
@@ -197,7 +197,7 @@ function Experience() {
             </div>
           </article>
           <article className="timeline-item reveal">
-            <div className="timeline-meta"><time>2024 — 2026</time><span>Financial</span></div>
+            <div className="timeline-meta"><time>2024 — 2026</time><span>Financial Account Support</span></div>
             <div>
               <h3>Customer Expert</h3>
               <p className="company">Coforge BPS · Fifth Third Bank</p>
@@ -215,7 +215,7 @@ function ProjectSupport() {
   return (
     <>
       <div className="project-copy">
-        <p className="project-label">Automotive service & recall case</p>
+        <p className="project-label">Automotive Service & Recall Case</p>
         <h3>Customer Support Workflow</h3>
         <p>A sample case showing a customer concern moving from inquiry and research through documentation, follow-up, and resolution.</p>
         <ol className="workflow-list"><li>Inquiry</li><li>Research</li><li>Response</li><li>Document</li><li>Follow-up</li><li>Resolve</li></ol>
@@ -223,7 +223,7 @@ function ProjectSupport() {
       </div>
       <div className="ticket-mockup" aria-label="Sample customer service ticket">
         <div className="mockup-top"><span>Case / AUTO-2026-0148</span><span className="pill pill-orange">Escalated</span></div>
-        <div className="ticket-body"><span className="ticket-icon">!</span><div><small>Customer concern</small><h4>Vehicle recall assistance</h4><p>Customer has been unable to arrange the required repair and is requesting support.</p></div></div>
+        <div className="ticket-body"><span className="ticket-icon">!</span><div><small>Customer Concern</small><h4>Vehicle Recall</h4><p>Customer has been unable to arrange the required repair and is requesting support.</p></div></div>
         <div className="ticket-fields"><p><small>Priority</small>Standard</p><p><small>Status</small>For review</p><p><small>Next step</small>Department update</p></div>
         <div className="ticket-progress" aria-hidden="true"><span /><span /><span /><span className="muted" /></div>
       </div>
@@ -235,7 +235,7 @@ function ProjectCrm() {
   return (
     <>
       <div className="project-copy">
-        <p className="project-label">Customer case tracking dashboard</p>
+        <p className="project-label">Customer Case Tracking Dashboard</p>
         <h3>CRM & Data Organization</h3>
         <p>A clear way for a service business to record inquiries, categorize requests, document actions, track follow-ups, and keep customer records current.</p>
         <ul className="skill-tags"><li>CRM</li><li>Data entry</li><li>Documentation</li><li>Follow-up tracking</li></ul>
@@ -259,7 +259,7 @@ function ProjectEmail() {
   return (
     <>
       <div className="project-copy">
-        <p className="project-label">Inbox organization & prioritization</p>
+        <p className="project-label">Inbox Organization & Prioritization</p>
         <h3>Email Management</h3>
         <p>A repeatable inbox system that identifies urgency, groups conversations by next action, and keeps important customer requests from being overlooked.</p>
         <ol className="workflow-list"><li>Review</li><li>Prioritize</li><li>Categorize</li><li>Respond</li><li>Follow up</li><li>Organize</li></ol>
@@ -321,7 +321,7 @@ function ProjectSocial() {
   return (
     <>
       <div className="project-copy">
-        <p className="project-label">Promotional and social content</p>
+        <p className="project-label">Social Media Content & Promotional Design</p>
         <h3>Social Media & Canva</h3>
         <p>Sample promotional graphics and social layouts demonstrating hierarchy, typography, product presentation, visual consistency, and content organization.</p>
         <ul className="skill-tags"><li>Canva</li><li>Graphic design</li><li>Content planning</li><li>Visual communication</li></ul>
@@ -382,8 +382,8 @@ function Portfolio() {
     <section className="work section-light" id="work" aria-labelledby="work-title">
       <div className="page-shell">
         <div className="section-heading work-heading reveal">
-          <p className="section-number">04 / Selected work</p>
-          <h2 id="work-title">A look at <em>what I can do.</em></h2>
+          <p className="section-number">07 / Portfolio</p>
+          <h2 id="work-title">A look at <em>what I can do</em></h2>
           <p>Demonstration projects that show how I think, organize information, and support day-to-day business needs.</p>
         </div>
         <div className="project-tabs reveal">
@@ -417,8 +417,8 @@ function FAQ() {
     <section className="faq section-light" id="faq" aria-labelledby="faq-title">
       <div className="page-shell faq-grid">
         <div className="faq-heading reveal">
-          <p className="section-number">08 / FAQ</p>
-          <h2 id="faq-title">Good questions, <em>clear answers.</em></h2>
+          <p className="section-number">12 / FAQ</p>
+          <h2 id="faq-title">Frequently Asked <em>Questions</em></h2>
           <p>Something else in mind? Send me an email and tell me what support would make your week easier.</p>
           <a className="text-link" href="mailto:jadrpanes17@gmail.com">Email Jadr <span aria-hidden="true">↗</span></a>
         </div>
@@ -433,6 +433,22 @@ function FAQ() {
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function FinalCTA() {
+  return (
+    <section className="final-cta section-accent" aria-labelledby="final-cta-title">
+      <div className="page-shell">
+        <p className="section-number">13 / Final CTA</p>
+        <h2 id="final-cta-title">Have tasks that are taking too much <em>of your time?</em></h2>
+        <p className="final-cta-lede">Let me help you get them done.</p>
+        <p>Whether you need help with:</p>
+        <ul className="skill-tags"><li>Customer Support</li><li>Administrative Tasks</li><li>CRM & Data</li><li>Email Management</li><li>Canva & Social Media</li></ul>
+        <p>Let’s talk.</p>
+        <a className="button button-dark" href="#contact">Let’s work together <span aria-hidden="true">↗</span></a>
       </div>
     </section>
   );
@@ -467,9 +483,8 @@ function Contact() {
     <section className="contact section-accent" id="contact" aria-labelledby="contact-title">
       <div className="page-shell contact-grid">
         <div className="contact-copy reveal">
-          <p className="section-number">09 / Contact</p>
-          <h2 id="contact-title">Have tasks taking too much <em>of your time?</em></h2>
-          <p>Let me help you get them done. Tell me what’s on your plate, and we can find a practical way forward.</p>
+          <p className="section-number">14 / Contact</p>
+          <h2 id="contact-title">Let’s work <em>together.</em></h2>
           <div className="direct-contact">
             <a href="mailto:jadrpanes17@gmail.com"><small>Email</small><span>jadrpanes17@gmail.com</span></a>
             <a href="tel:+639452749552"><small>Call</small><span>+63 945 274 9552</span></a>
@@ -555,8 +570,8 @@ export default function App() {
 
         <section className="about section-light" id="about" aria-labelledby="about-title">
           <div className="page-shell about-grid">
-            <div className="section-intro reveal"><p className="section-number">01 / About</p><h2 id="about-title">Professional experience. <em>Practical support.</em></h2></div>
-            <div className="about-copy reveal"><p className="lede">A client-first mindset shaped in fast-paced customer support environments.</p><p>I’m Jadr Panes, a Virtual Assistant with a professional background in customer service and account support. I’ve supported automotive and financial accounts where accuracy, communication, documentation, privacy, and problem-solving are essential.</p><p>I now bring those skills into virtual assistance—helping businesses manage everyday tasks, customer communication, information, and digital support with care.</p><a className="text-link" href="#experience">See my professional journey <span aria-hidden="true">↘</span></a></div>
+            <div className="section-intro reveal"><p className="section-number">03 / About Me</p><h2 id="about-title">A little <em>about me</em></h2></div>
+            <div className="about-copy reveal"><p className="lede">Professional experience. Practical support. A client-first mindset.</p><p>I’m Jadr Panes, a Virtual Assistant with a professional background in customer service and account support. I’ve supported automotive and financial accounts where accuracy, communication, documentation, privacy, and problem-solving are essential.</p><p>I now bring those skills into virtual assistance—helping businesses manage everyday tasks, customer communication, information, and digital support with care.</p><a className="text-link" href="#experience">See my professional journey <span aria-hidden="true">↘</span></a></div>
             <figure className="about-photo reveal"><img src="/jadr-photos/5.png" alt="Portrait of Jadr Panes against a vivid magenta background" loading="lazy" /><figcaption>Based in Las Piñas City<br />Working remotely worldwide</figcaption></figure>
           </div>
         </section>
@@ -565,7 +580,7 @@ export default function App() {
 
         <section className="why section-accent" aria-labelledby="why-title">
           <div className="page-shell">
-            <div className="section-heading reveal"><p className="section-number">More than task support</p><h2 id="why-title">A reliable partner <em>in the details.</em></h2></div>
+            <div className="section-heading reveal"><p className="section-number">05 / Why Jadr?</p><h2 id="why-title">More than task support. <em>A reliable partner.</em></h2></div>
             <div className="why-grid">{strengths.map(([title, text], index) => <article className="reveal" key={title}><span>{String(index + 1).padStart(2, "0")}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
           </div>
         </section>
@@ -575,22 +590,22 @@ export default function App() {
 
         <section className="process section-cream" id="process" aria-labelledby="process-title">
           <div className="page-shell process-grid">
-            <div className="process-heading reveal"><p className="section-number">05 / Process</p><h2 id="process-title">Simple process. <em>Reliable execution.</em></h2><p>Clear steps keep the work organized and make collaboration easy from the first conversation to final delivery.</p><a className="button button-dark" href="#contact">Start a conversation <span aria-hidden="true">↗</span></a></div>
+            <div className="process-heading reveal"><p className="section-number">08 / My Work Process</p><h2 id="process-title">Simple process. <em>Reliable execution.</em></h2><p>Clear steps keep the work organized and make collaboration easy from the first conversation to final delivery.</p><a className="button button-dark" href="#contact">Start a conversation <span aria-hidden="true">↗</span></a></div>
             <ol className="process-list">{processSteps.map(([title, text], index) => <li className="reveal" key={title}><span>{String(index + 1).padStart(2, "0")}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
           </div>
         </section>
 
         <section className="toolkit section-light" aria-labelledby="tools-title">
           <div className="page-shell">
-            <SectionHeading number="06 / Toolkit" title="Skills that keep work" emphasis="moving." headingId="tools-title" />
+            <SectionHeading number="09 / Tools & Skills" title="Tools &" emphasis="Skills" headingId="tools-title" />
             <div className="tool-groups">{tools.map(([group, ...items]) => <article className="reveal" key={group}><span>{group}</span>{items.map((item) => <p key={item}>{item}</p>)}</article>)}</div>
-            <div className="audience-strip reveal"><p>Who I can help</p><div><span>Small business owners</span><span>Online businesses & influencers</span><span>Service-based businesses</span><span>Entrepreneurs</span></div></div>
+            <section className="audience-strip reveal" aria-labelledby="audience-title"><div><p className="section-number">10 / Who I Can Help</p><h2 id="audience-title">Who can I help?</h2></div><div><span>Small Business Owners</span><span>Online Businesses/Influencers</span><span>Service-Based Businesses</span><span>Entrepreneurs</span></div></section>
           </div>
         </section>
 
         <section className="testimonials section-dark" aria-labelledby="testimonials-title">
           <div className="page-shell">
-            <SectionHeading number="07 / Testimonials" title="What people" emphasis="say." headingId="testimonials-title" />
+            <SectionHeading number="11 / Testimonials" title="What People" emphasis="Say" headingId="testimonials-title" />
             <div className="quote-grid">
               <figure className="reveal"><blockquote>“Jadr is easy to work with and takes his responsibilities seriously. He stays patient when handling customer concerns, pays attention to details, and makes sure cases are properly documented and handled.”</blockquote><figcaption><strong>John Paul Vito</strong><span>Supervisor · Teleperformance — Stellantis FCA</span></figcaption></figure>
               <figure className="reveal"><blockquote>“Jadr is patient and professional when assisting customers with banking concerns. He communicates well, understands what customers need, and pays attention to accuracy.”</blockquote><figcaption><strong>Katherine Gamboa</strong><span>Fifth Third Bank Account Supervisor · Coforge BPS</span></figcaption></figure>
@@ -599,6 +614,7 @@ export default function App() {
         </section>
 
         <FAQ />
+        <FinalCTA />
         <Contact />
       </main>
       <Footer />

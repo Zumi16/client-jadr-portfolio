@@ -231,6 +231,9 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .audience-strip { display: grid; grid-template-columns: .25fr 1fr; gap: 4vw; align-items: start; margin-top: 70px; padding-top: 26px; border-top: 1px solid var(--ink); }
 .audience-strip > p { margin: 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .13em; }
 .audience-strip > div { display: flex; flex-wrap: wrap; gap: 10px; }
+.audience-strip > div:first-child { display: block; }
+.audience-strip .section-number { margin-bottom: 12px; }
+.audience-strip h2 { font-size: clamp(30px, 3vw, 42px); }
 .audience-strip span { padding: 10px 15px; border-radius: 999px; background: var(--cream); font-size: 12px; }
 
 .testimonials .section-heading { color: var(--paper); }
@@ -253,6 +256,11 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .faq-item.is-open button span { transform: rotate(45deg); }
 .faq-answer p { margin: -5px 50px 28px 0; color: var(--muted); }
 
+.final-cta { padding: 100px 0; border-bottom: 1px solid var(--line); }
+.final-cta h2 { max-width: 1050px; }
+.final-cta-lede { margin-top: 30px; font-family: var(--serif); font-size: 32px; }
+.final-cta .skill-tags { gap: 10px; }
+.final-cta .button { margin-top: 12px; }
 .contact-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 9vw; }
 .contact-copy h2 em { color: var(--pink); }
 .contact-copy > p:not(.section-number) { max-width: 560px; }
