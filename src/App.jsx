@@ -491,42 +491,20 @@ function ReelsPortfolio() {
   );
 }
 
-function SpotifyPlayerDialog({ artist, onClose }) {
-  const dialogRef = useRef(null);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    const previousFocus = document.activeElement;
-    dialog.showModal();
-    document.body.classList.add("lightbox-open");
-    return () => {
-      dialog.close();
-      document.body.classList.remove("lightbox-open");
-      previousFocus?.focus();
-    };
-  }, []);
-
-  function handleBackdropClick(event) {
-    if (event.target !== event.currentTarget) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
-  }
-
-  return createPortal(
-    <dialog ref={dialogRef} className="music-player-dialog" aria-labelledby="music-player-title" onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={handleBackdropClick}>
-      <button type="button" className="music-player-close" onClick={onClose} aria-label="Close music player" autoFocus><CloseIcon className="ui-icon" /></button>
-      <p className="music-player-label"><HeadphonesRoundedIcon className="ui-icon" /> Artist spotlight</p>
-      <h3 id="music-player-title">Listen to {artist.name}</h3>
-      <iframe src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
-      <p className="music-player-note">Playback is provided by Spotify. <a href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer">Open in Spotify <NorthEastIcon className="ui-icon" /></a></p>
-    </dialog>,
-    document.body,
-  );
-}
-
 function AudioPortfolio() {
   const [activeArtist, setActiveArtist] = useState(null);
   const [playingArtist, setPlayingArtist] = useState(null);
+  const playButtonRefs = useRef([]);
+  const inlineCloseRef = useRef(null);
+
+  useEffect(() => {
+    if (playingArtist) inlineCloseRef.current?.focus();
+  }, [playingArtist]);
+
+  function closeInlinePlayer(index) {
+    setPlayingArtist(null);
+    window.requestAnimationFrame(() => playButtonRefs.current[index]?.focus());
+  }
 
   return (
     <section className="audio-mixing section-cream" id="audio-mixing" aria-labelledby="audio-title">
@@ -534,27 +512,36 @@ function AudioPortfolio() {
         <SectionHeading number="07B / Audio Portfolio" title="Audio Mixing" emphasis="Portfolio" text="As an Audio & Sound Mixing Engineer, these are the artists I’ve worked with in the past. Explore their music on Spotify." headingId="audio-title" className="audio-intro-heading" />
         <div className="audio-credits reveal"><span className="credits-icon" aria-hidden="true"><CheckIcon className="ui-icon" /></span><div><h3>Find my name in the song credits.</h3><p>Look for <strong>Jadr Panes</strong> in the credits of releases I’ve worked on. Open an artist’s Spotify profile below, choose a song, and check its credits.</p></div></div>
         <div className="artist-grid">
-          {audioArtists.map((artist, index) => (
-            <article className="artist-card reveal" key={artist.name}>
-              <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
-              <button type="button" className="artist-image-button" onClick={() => setActiveArtist(artist)} aria-label={`Enlarge ${artist.name} artist image`}>
-                <img src={artist.src} alt={artist.alt} loading="lazy" />
-                <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
-              </button>
-              <div className="artist-copy"><h3>{artist.name}</h3><p>Audio & Sound Mixing</p></div>
-              <div className="artist-player-controls">
-                <button type="button" className="artist-secondary-control" onClick={() => setActiveArtist(artist)} aria-label={`View ${artist.name} artwork`} title="View artwork"><OpenInFullRoundedIcon className="ui-icon" /></button>
-                <button type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Open ${artist.name} Spotify player`} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
-                <a className="artist-secondary-control" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`} title="Open in Spotify"><NorthEastIcon className="ui-icon" /></a>
-              </div>
-              <button type="button" className="artist-listen-label" onClick={() => setPlayingArtist(artist)}>Listen on Spotify</button>
-              <p className="artist-mixing-credit">Jadr Panes <span aria-hidden="true">·</span> Audio & Sound Mixing</p>
-            </article>
-          ))}
+          {audioArtists.map((artist, index) => {
+            const isPlaying = playingArtist?.spotifyId === artist.spotifyId;
+            return (
+              <figure className="artist-item reveal" key={artist.name}>
+                <article className="artist-card">
+                  <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span style={{ visibility: isPlaying ? "hidden" : undefined }}>{String(index + 1).padStart(2, "0")} / 05</span>{isPlaying && <button ref={inlineCloseRef} type="button" className="artist-inline-close" onClick={() => closeInlinePlayer(index)} aria-label={`Back to ${artist.name} artwork`} title="Back to artwork"><CloseIcon className="ui-icon" /></button>}</div>
+                  <div className="artist-player-surface" id={`artist-player-${artist.spotifyId}`}>
+                    <div className="artist-player-front" aria-hidden={isPlaying} inert={isPlaying}>
+                      <button type="button" className="artist-image-button" onClick={() => setActiveArtist(artist)} aria-label={`Enlarge ${artist.name} artist image`}>
+                        <img src={artist.src} alt={artist.alt} loading="lazy" />
+                        <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
+                      </button>
+                      <div className="artist-copy"><h3>{artist.name}</h3><p>Playback is provided by Spotify. </p></div>
+                      <div className="artist-player-controls">
+                        <button type="button" className="artist-secondary-control" onClick={() => setActiveArtist(artist)} aria-label={`View ${artist.name} artwork`} title="View artwork"><OpenInFullRoundedIcon className="ui-icon" /></button>
+                        <button ref={(button) => { playButtonRefs.current[index] = button; }} type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Play ${artist.name} inline on Spotify`} aria-controls={`artist-player-${artist.spotifyId}`} aria-expanded={isPlaying} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
+                        <a className="artist-secondary-control" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`} title="Open in Spotify"><NorthEastIcon className="ui-icon" /></a>
+                      </div>
+                    </div>
+                    {isPlaying && <iframe className="artist-inline-player" src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />}
+                  </div>
+                  <p className="music-player-note"><a href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer">Open in Spotify <NorthEastIcon className="ui-icon" /></a></p>
+                  <p className="artist-mixing-credit">Jadr Panes <span aria-hidden="true">·</span> Audio & Sound Mixing</p>
+                </article>
+              </figure>
+            );
+          })}
         </div>
       </div>
       {activeArtist && <ImageLightbox image={activeArtist} onClose={() => setActiveArtist(null)} />}
-      {playingArtist && <SpotifyPlayerDialog artist={playingArtist} onClose={() => setPlayingArtist(null)} />}
     </section>
   );
 }
