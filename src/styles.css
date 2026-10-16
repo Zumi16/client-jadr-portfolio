@@ -378,12 +378,16 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 
 @media (max-width: 760px) {
   :root { --shell: calc(100% - 36px); }
-  .site-header { height: 70px; padding-inline: 18px; }
+  /* A filtered header would become the fixed menu's containing block. */
+  .site-header, .site-header.is-scrolled { height: 70px; padding-inline: 18px; -webkit-backdrop-filter: none; backdrop-filter: none; }
   .brand-copy strong { font-size: 20px; }
   .brand-mark { width: 38px; height: 38px; }
   .site-header .menu-toggle { display: grid; place-items: center; position: relative; z-index: 2; }
-  .site-nav { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 18px; padding: 90px 28px 30px; background: var(--ink); transform: translateX(100%); transition: transform .3s ease; }
+  .site-nav { position: fixed; inset: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 18px; padding: 90px 28px 30px; overflow-y: auto; overscroll-behavior: contain; background: var(--ink); transform: translateX(100%); transition: transform .3s ease; }
   .site-nav.is-open { transform: none; }
+  .site-nav > a { flex-shrink: 0; }
+  .site-nav > a:first-child { margin-top: auto; }
+  .site-nav > a:last-child { margin-bottom: auto; }
   .site-nav > a:not(.nav-cta) { display: block; font-family: var(--serif); font-size: 42px; opacity: 1; }
   .site-nav .nav-cta { margin-top: 15px; }
   .hero { min-height: auto; padding: 120px 0 90px; }
