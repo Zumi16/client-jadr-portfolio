@@ -243,7 +243,7 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .audio-credits p { max-width: 840px; margin: 0; font-size: 13px; }
 .artist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 18px; }
 .artist-item { width: 100%; min-width: 0; max-width: 242px; margin: 0; justify-self: center; }
-.artist-card { --ink: #fff; --paper: #181818; --muted: #b3b3b3; --line: rgba(255,255,255,.12); --pink: #1ed760; position: relative; width: 100%; min-width: 0; max-width: 242px; justify-self: center; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.08); color-scheme: dark; perspective: 1000px; }
+.artist-card { --ink: #fff; --paper: #181818; --muted: #b3b3b3; --line: rgba(255,255,255,.12); --pink: #1ed760; position: relative; width: 100%; min-width: 0; max-width: 242px; justify-self: center; padding: 0; overflow: hidden; border: 0; border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.08); color-scheme: dark; perspective: 1000px; }
 .artist-player-label { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 10px; padding: 12px 12px 0; color: var(--muted); font-size: 8px; font-weight: 500; }
 .artist-player-label > span:first-child { display: inline-flex; align-items: center; gap: 5px; }
 .artist-player-label .ui-icon { color: var(--pink); font-size: 12px; }
