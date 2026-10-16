@@ -498,12 +498,12 @@ function AudioPortfolio() {
   const inlineCloseRef = useRef(null);
 
   useEffect(() => {
-    if (playingArtist) inlineCloseRef.current?.focus();
+    if (playingArtist) inlineCloseRef.current?.focus({ preventScroll: true });
   }, [playingArtist]);
 
   function closeInlinePlayer(index) {
     setPlayingArtist(null);
-    window.requestAnimationFrame(() => playButtonRefs.current[index]?.focus());
+    window.requestAnimationFrame(() => playButtonRefs.current[index]?.focus({ preventScroll: true }));
   }
 
   return (
@@ -517,9 +517,9 @@ function AudioPortfolio() {
             return (
               <figure className="artist-item reveal" key={artist.name}>
                 <article className="artist-card">
-                  <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span style={{ visibility: isPlaying ? "hidden" : undefined }}>{String(index + 1).padStart(2, "0")} / 05</span>{isPlaying && <button ref={inlineCloseRef} type="button" className="artist-inline-close" onClick={() => closeInlinePlayer(index)} aria-label={`Back to ${artist.name} artwork`} title="Back to artwork"><CloseIcon className="ui-icon" /></button>}</div>
-                  <div className="artist-player-surface" id={`artist-player-${artist.spotifyId}`}>
+                  <div className={`artist-card-turner${isPlaying ? " is-flipped" : ""}`}>
                     <div className="artist-player-front" aria-hidden={isPlaying} inert={isPlaying}>
+                      <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
                       <button type="button" className="artist-image-button" onClick={() => setActiveArtist(artist)} aria-label={`Enlarge ${artist.name} artist image`}>
                         <img src={artist.src} alt={artist.alt} loading="lazy" />
                         <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
@@ -530,11 +530,16 @@ function AudioPortfolio() {
                         <button ref={(button) => { playButtonRefs.current[index] = button; }} type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Play ${artist.name} inline on Spotify`} aria-controls={`artist-player-${artist.spotifyId}`} aria-expanded={isPlaying} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
                         <a className="artist-secondary-control" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`} title="Open in Spotify"><NorthEastIcon className="ui-icon" /></a>
                       </div>
+                      <p className="music-player-note"><a href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer">Open in Spotify <NorthEastIcon className="ui-icon" /></a></p>
+                      <p className="artist-mixing-credit">Jadr Panes <span aria-hidden="true">·</span> Audio & Sound Mixing</p>
                     </div>
-                    {isPlaying && <iframe className="artist-inline-player" src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />}
+                    <div className="artist-player-back" id={`artist-player-${artist.spotifyId}`} role="region" aria-label={`${artist.name} Spotify player`} aria-hidden={!isPlaying} inert={!isPlaying}>
+                      {isPlaying && <>
+                        <iframe className="artist-inline-player" src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
+                        <button ref={inlineCloseRef} type="button" className="artist-inline-close" onClick={() => closeInlinePlayer(index)} aria-label={`Flip back to ${artist.name} information`} title="Back to artist information"><CloseIcon className="ui-icon" /></button>
+                      </>}
+                    </div>
                   </div>
-                  <p className="music-player-note"><a href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer">Open in Spotify <NorthEastIcon className="ui-icon" /></a></p>
-                  <p className="artist-mixing-credit">Jadr Panes <span aria-hidden="true">·</span> Audio & Sound Mixing</p>
                 </article>
               </figure>
             );
@@ -679,7 +684,7 @@ export default function App() {
         <section className="hero section-dark" id="home" aria-labelledby="hero-title">
           <div className="hero-grid page-shell">
             <div className="hero-copy reveal">
-              <p className="eyebrow hero-eyebrow">{["Virtual assistant", "Customer support", "Social Media Manager", "Audio & Sound Mixing Engineer"].map((role, index) => <span className="hero-role" key={role}>{role}{index < 3 && <span className="role-separator" aria-hidden="true"><CircleIcon className="ui-icon" /></span>}</span>)}</p>
+              <p className="eyebrow hero-eyebrow">{["Virtual assistant", "Customer support", "Administrative support","Social Media Manager", "Audio & Sound Mixing Engineer"].map((role, index) => <span className="hero-role" key={role}>{role}{index < 4 && <span className="role-separator" aria-hidden="true"><CircleIcon className="ui-icon" /></span>}</span>)}</p>
               <h1 id="hero-title">The reliable support <em>behind your business.</em></h1>
               <p className="hero-intro">Hi, I’m Jadr Panes, a Virtual Assistant with professional experience in customer service, account support, administrative assistance, CRM management, data entry, email management, social media marketing, Graphic designing, and Audio and Sound Mixing Engineer</p>
               <div className="hero-actions"><a className="button button-accent" href="#services">View my services <span aria-hidden="true"><ArrowDownwardIcon className="ui-icon" /></span></a><a className="button button-ghost" href="#contact">Let’s work together <span aria-hidden="true"><NorthEastIcon className="ui-icon" /></span></a></div>
