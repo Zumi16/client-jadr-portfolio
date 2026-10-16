@@ -108,10 +108,10 @@ const videoSamples = [
 ];
 
 const audioArtists = [
+  { name: "JDRX", image: 4, spotifyId: "53WGKDzoDHR36FwHBXKcp9" },
   { name: "GSPL", image: 1, spotifyId: "1dkBhGpPP0CiUtjLxd1RVP" },
   { name: "Biscotti", image: 2, spotifyId: "5WGRlSlKOppOwUFPkaoVZe" },
   { name: "Jepp", image: 3, spotifyId: "2qkKewUA3Of7UyVatTEpIB" },
-  { name: "JDRX", image: 4, spotifyId: "53WGKDzoDHR36FwHBXKcp9" },
   { name: "IVAN", image: 5, spotifyId: "72oAXiBu0XL7WbyugTEv8P" },
 ].map((artist) => ({
   ...artist,
