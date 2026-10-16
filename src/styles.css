@@ -215,7 +215,7 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .gallery-image-button { position: relative; display: block; width: 100%; aspect-ratio: .72; padding: 0; overflow: hidden; border: 0; background: transparent; cursor: zoom-in; }
 .gallery-grid img { width: 100%; height: 100%; object-fit: contain; transition: transform .3s ease; }
 .gallery-image-button:hover img { transform: scale(1.025); }
-.zoom-hint { position: absolute; right: 8px; bottom: 8px; padding: 5px 8px; border-radius: 999px; background: rgba(23,23,19,.84); color: var(--paper); font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
+.zoom-hint { position: absolute; right: 8px; bottom: 8px; padding: 5px 8px; border-radius: 999px; background: rgba(23,23,19,.84); color: var(--white); font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: 0; transform: translateY(4px); transition: opacity .2s, transform .2s; }
 .gallery-image-button:hover .zoom-hint, .gallery-image-button:focus-visible .zoom-hint { opacity: 1; transform: none; }
 .gallery-grid figcaption { min-height: 3.2em; margin-top: 7px; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; }
 .lightbox { position: fixed; z-index: 500; inset: 0; display: flex; align-items: center; justify-content: center; padding: 56px 24px 24px; background: rgba(0,0,0,.88); animation: lightbox-in .22s ease both; }
@@ -243,11 +243,11 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .audio-credits p { max-width: 840px; margin: 0; font-size: 13px; }
 .artist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 18px; }
 .artist-item { width: 100%; min-width: 0; max-width: 242px; margin: 0; justify-self: center; }
-.artist-card { position: relative; width: 100%; min-width: 0; max-width: 242px; justify-self: center; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); perspective: 1000px; }
+.artist-card { --ink: #fff; --paper: #181818; --muted: #b3b3b3; --line: rgba(255,255,255,.12); --pink: #1ed760; position: relative; width: 100%; min-width: 0; max-width: 242px; justify-self: center; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); color: var(--ink); box-shadow: 0 8px 18px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.08); color-scheme: dark; perspective: 1000px; }
 .artist-player-label { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-bottom: 10px; padding: 12px 12px 0; color: var(--muted); font-size: 8px; font-weight: 500; }
 .artist-player-label > span:first-child { display: inline-flex; align-items: center; gap: 5px; }
 .artist-player-label .ui-icon { color: var(--pink); font-size: 12px; }
-.artist-player-label > span:last-child { color: #969188; font-variant-numeric: tabular-nums; }
+.artist-player-label > span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; }
 .artist-image-button { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; margin: 0; padding: 0; overflow: hidden; border: 0; border-radius: 0; background: var(--paper); cursor: zoom-in; }
 .artist-image-button img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0%; }
 .artist-image-button:hover .zoom-hint, .artist-image-button:focus-visible .zoom-hint { opacity: 1; transform: none; }
@@ -256,10 +256,10 @@ h2 { font-size: clamp(52px, 6.1vw, 92px); }
 .artist-copy > p { margin: 3px 0 0; color: var(--muted); font-size: 10px; }
 .artist-player-controls { display: flex; align-items: center; justify-content: space-between; width: calc(100% - 28px); max-width: 180px; margin: 10px auto 0; }
 .artist-secondary-control { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--muted); font-size: 18px; cursor: pointer; transition: background .2s, color .2s; }
-.artist-secondary-control:hover { background: rgba(23,23,19,.05); color: var(--ink); }
-.artist-play-control { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--ink); color: var(--paper); cursor: pointer; transition: background .2s, color .2s, transform .2s; }
+.artist-secondary-control:hover { background: rgba(255,255,255,.08); color: var(--ink); }
+.artist-play-control { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--pink); color: var(--paper); cursor: pointer; transition: background .2s, color .2s, transform .2s; }
 .artist-play-control .ui-icon { font-size: 28px; }
-.artist-play-control:hover { transform: scale(1.04); background: var(--pink); color: var(--ink); }
+.artist-play-control:hover { transform: scale(1.04); background: #3be477; color: var(--paper); }
 .artist-mixing-credit { margin: 10px 14px 14px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 8px; }
 .artist-mixing-credit span { margin-inline: 5px; color: var(--pink); }
 .artist-card-turner { position: relative; transform-style: preserve-3d; transition: transform .5s ease; }

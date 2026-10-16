@@ -188,12 +188,12 @@ function Header() {
   );
 }
 
-function SectionHeading({ number, title, emphasis, text, className = "", headingId }) {
+function SectionHeading({ number, title, emphasis, text, className = "", textClassName = "", headingId }) {
   return (
     <div className={`section-heading reveal ${className}`}>
       <p className="section-number">{number}</p>
       <h2 id={headingId}>{title}{emphasis && <> <em>{emphasis}</em></>}</h2>
-      {text && <p>{text}</p>}
+      {text && <p>{textClassName ? <span className={textClassName}>{text}</span> : text}</p>}
     </div>
   );
 }
@@ -509,7 +509,7 @@ function AudioPortfolio() {
   return (
     <section className="audio-mixing section-cream" id="audio-mixing" aria-labelledby="audio-title">
       <div className="page-shell">
-        <SectionHeading number="07B / Audio Portfolio" title="Audio Mixing" emphasis="Portfolio" text="As an Audio & Sound Mixing Engineer, these are the artists I’ve worked with in the past. Explore their music on Spotify." headingId="audio-title" className="audio-intro-heading" />
+        <SectionHeading number="07B / Audio Portfolio" title="Audio Mixing" emphasis="Portfolio" text="As an Audio & Sound Mixing Engineer, these are the artists I’ve worked with in the past. Explore their music on Spotify." headingId="audio-title" className="audio-intro-heading" textClassName="audio-text-highlight" />
         <div className="audio-credits reveal"><span className="credits-icon" aria-hidden="true"><CheckIcon className="ui-icon" /></span><div><h3>Find my name in the song credits.</h3><p>Look for <strong>Jadr Panes</strong> in the credits of releases I’ve worked on. Open an artist’s Spotify profile below, choose a song, and check its credits.</p></div></div>
         <div className="artist-grid">
           {audioArtists.map((artist, index) => {
@@ -535,7 +535,7 @@ function AudioPortfolio() {
                     </div>
                     <div className="artist-player-back" id={`artist-player-${artist.spotifyId}`} role="region" aria-label={`${artist.name} Spotify player`} aria-hidden={!isPlaying} inert={!isPlaying}>
                       {isPlaying && <>
-                        <iframe className="artist-inline-player" src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
+                        <iframe className="artist-inline-player" src={`https://open.spotify.com/embed/artist/${artist.spotifyId}?theme=0`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
                         <button ref={inlineCloseRef} type="button" className="artist-inline-close" onClick={() => closeInlinePlayer(index)} aria-label={`Flip back to ${artist.name} information`} title="Back to artist information"><CloseIcon className="ui-icon" /></button>
                       </>}
                     </div>
