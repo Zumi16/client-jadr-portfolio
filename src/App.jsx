@@ -12,7 +12,6 @@ import CircleIcon from "@mui/icons-material/Circle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
-import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import HeadphonesRoundedIcon from "@mui/icons-material/HeadphonesRounded";
 
 const navItems = [
@@ -492,7 +491,6 @@ function ReelsPortfolio() {
 }
 
 function AudioPortfolio() {
-  const [activeArtist, setActiveArtist] = useState(null);
   const [playingArtist, setPlayingArtist] = useState(null);
   const playButtonRefs = useRef([]);
   const inlineCloseRef = useRef(null);
@@ -520,13 +518,12 @@ function AudioPortfolio() {
                   <div className={`artist-card-turner${isPlaying ? " is-flipped" : ""}`}>
                     <div className="artist-player-front" aria-hidden={isPlaying} inert={isPlaying}>
                       <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
-                      <button type="button" className="artist-image-button" onClick={() => setActiveArtist(artist)} aria-label={`Enlarge ${artist.name} artist image`}>
+                      <a className="artist-image-link" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`}>
                         <img src={artist.src} alt={artist.alt} loading="lazy" />
-                        <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
-                      </button>
+                        <span className="zoom-hint" aria-hidden="true">Spotify <NorthEastIcon className="ui-icon" /></span>
+                      </a>
                       <div className="artist-copy"><h3>{artist.name}</h3><p>Playback is provided by Spotify. </p></div>
                       <div className="artist-player-controls">
-                        <button type="button" className="artist-secondary-control" onClick={() => setActiveArtist(artist)} aria-label={`View ${artist.name} artwork`} title="View artwork"><OpenInFullRoundedIcon className="ui-icon" /></button>
                         <button ref={(button) => { playButtonRefs.current[index] = button; }} type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Play ${artist.name} inline on Spotify`} aria-controls={`artist-player-${artist.spotifyId}`} aria-expanded={isPlaying} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
                         <a className="artist-secondary-control" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`} title="Open in Spotify"><NorthEastIcon className="ui-icon" /></a>
                       </div>
@@ -546,7 +543,6 @@ function AudioPortfolio() {
           })}
         </div>
       </div>
-      {activeArtist && <ImageLightbox image={activeArtist} onClose={() => setActiveArtist(null)} />}
     </section>
   );
 }
