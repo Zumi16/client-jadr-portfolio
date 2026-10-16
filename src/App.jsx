@@ -542,7 +542,6 @@ function AudioPortfolio() {
                 <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
               </button>
               <div className="artist-copy"><h3>{artist.name}</h3><p>Audio & Sound Mixing</p></div>
-              <div className="artist-waveform" aria-hidden="true">{[25, 45, 30, 65, 85, 50, 100, 70, 40, 75, 55, 90, 65, 35, 80, 100, 60, 40, 75, 50, 90, 65, 40, 80, 55, 30, 65, 45, 25].map((height, bar) => <span key={bar} style={{ "--bar-height": `${height}%` }} />)}</div>
               <div className="artist-player-controls">
                 <button type="button" className="artist-secondary-control" onClick={() => setActiveArtist(artist)} aria-label={`View ${artist.name} artwork`} title="View artwork"><OpenInFullRoundedIcon className="ui-icon" /></button>
                 <button type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Open ${artist.name} Spotify player`} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
@@ -693,7 +692,7 @@ export default function App() {
         <section className="hero section-dark" id="home" aria-labelledby="hero-title">
           <div className="hero-grid page-shell">
             <div className="hero-copy reveal">
-              <p className="eyebrow hero-eyebrow">{["Virtual assistant", "Customer support", "Administrative support", "Social Media Manager", "Audio & Sound Mixing Engineer"].map((role, index) => <span className="hero-role" key={role}>{role}{index < 4 && <span className="role-separator" aria-hidden="true"><CircleIcon className="ui-icon" /></span>}</span>)}</p>
+              <p className="eyebrow hero-eyebrow">{["Virtual assistant", "Customer support", "Social Media Manager", "Audio & Sound Mixing Engineer"].map((role, index) => <span className="hero-role" key={role}>{role}{index < 3 && <span className="role-separator" aria-hidden="true"><CircleIcon className="ui-icon" /></span>}</span>)}</p>
               <h1 id="hero-title">The reliable support <em>behind your business.</em></h1>
               <p className="hero-intro">Hi, I’m Jadr Panes, a Virtual Assistant with professional experience in customer service, account support, administrative assistance, CRM management, data entry, email management, social media marketing, Graphic designing, and Audio and Sound Mixing Engineer</p>
               <div className="hero-actions"><a className="button button-accent" href="#services">View my services <span aria-hidden="true"><ArrowDownwardIcon className="ui-icon" /></span></a><a className="button button-ghost" href="#contact">Let’s work together <span aria-hidden="true"><NorthEastIcon className="ui-icon" /></span></a></div>
