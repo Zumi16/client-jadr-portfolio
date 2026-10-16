@@ -11,12 +11,16 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CircleIcon from "@mui/icons-material/Circle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
+import HeadphonesRoundedIcon from "@mui/icons-material/HeadphonesRounded";
 
 const navItems = [
   ["About", "about"],
   ["Services", "services"],
   ["Experience", "experience"],
   ["Work", "work"],
+  ["Audio", "audio-mixing"],
   ["Process", "process"],
 ];
 
@@ -43,8 +47,18 @@ const services = [
   },
   {
     title: "Social Media & Canva",
-    description: "Create simple, professional content for your online presence.",
-    items: ["Canva graphics", "Social media posts", "Content creation", "Promotional graphics", "Basic social assistance"],
+    description: "Support your online presence with social media management, marketing, and graphic design.",
+    items: ["Social media management", "Social media marketing", "Canva graphics", "Graphic design", "Content creation"],
+  },
+  {
+    title: "Reels & Video Content",
+    description: "Bring your content to life with short-form reels and videos.",
+    items: ["Business reels", "Instagram reels", "Daily vlog content", "Quote videos"],
+  },
+  {
+    title: "Audio & Sound Mixing",
+    description: "Audio and sound mixing support for artists and their music.",
+    items: ["Audio mixing", "Sound mixing", "Audio editing", "FL Studio"],
   },
 ];
 
@@ -67,12 +81,12 @@ const processSteps = [
 const tools = [
   ["Administrative", "Data Entry", "Documentation", "Email Management", "Administrative Support"],
   ["Customer Support", "Customer Service", "Issue Resolution", "Account Support", "Communication"],
-  ["Digital", "Canva", "Social Media", "Content Creation", "CRM"],
-  ["Creative", "FL Studio", "Audio Editing", "Audio Mixing", "Music Production"],
+  ["Digital", "Canva & Graphic Design", "Social Media Management", "Social Media Marketing", "Content Creation", "CRM"],
+  ["Creative", "FL Studio", "Audio Editing", "Audio & Sound Mixing", "Music Production", "Reels & Video Content"],
 ];
 
 const faqItems = [
-  ["What services do you offer?", "Administrative support, customer support, CRM and data entry, email management, and Canva or social media assistance."],
+  ["What services do you offer?", "Administrative support, customer support, CRM and data entry, email management, social media management and marketing, graphic design, reels and video content, and audio and sound mixing."],
   ["Are you available for remote work?", "Yes. I am based in the Philippines and available for remote opportunities."],
   ["Can you work with recurring tasks?", "Yes. Recurring administrative, customer-support, data, and digital tasks can be organized into a consistent workflow."],
   ["Do you handle sensitive information?", "My background includes working with sensitive customer and financial information while following privacy and security procedures."],
@@ -85,6 +99,26 @@ const projectTabs = [
   ["email", "Email management"],
   ["social", "Social & Canva"],
 ];
+
+const videoSamples = [
+  { file: "Business Reel.mp4", title: "Business Reel", type: "Business content" },
+  { file: "Instagram Reel - Daily Vlog.mp4", title: "Instagram Reel — Daily Vlog", type: "Lifestyle content" },
+  { file: "Quotes 1.mp4", title: "Quotes 01", type: "Quote video" },
+  { file: "Quotes 2.mp4", title: "Quotes 02", type: "Quote video" },
+];
+
+const audioArtists = [
+  { name: "GSPL", image: 1, spotifyId: "1dkBhGpPP0CiUtjLxd1RVP" },
+  { name: "Biscotti", image: 2, spotifyId: "5WGRlSlKOppOwUFPkaoVZe" },
+  { name: "Jepp", image: 3, spotifyId: "2qkKewUA3Of7UyVatTEpIB" },
+  { name: "JDRX", image: 4, spotifyId: "53WGKDzoDHR36FwHBXKcp9" },
+  { name: "IVAN", image: 5, spotifyId: "72oAXiBu0XL7WbyugTEv8P" },
+].map((artist) => ({
+  ...artist,
+  src: `/audio-mixing-images/audio-mixing%20(${artist.image}).jpg`,
+  alt: `${artist.name} Spotify artist profile`,
+  label: `${artist.name} artist profile`,
+}));
 
 function useRevealAnimations() {
   useEffect(() => {
@@ -288,27 +322,16 @@ function ProjectEmail() {
   );
 }
 
-function ProjectSocial() {
-  const [sampleType, setSampleType] = useState("canva");
-  const [activeImage, setActiveImage] = useState(null);
+function ImageLightbox({ image, onClose }) {
   const closeButtonRef = useRef(null);
-  const isCanva = sampleType === "canva";
-  const samples = [1, 2, 3, 4].map((number) => ({
-    src: isCanva ? `/${number}.png` : `/social-media-sample/${number}.png`,
-    alt: isCanva
-      ? `Canva promotional graphic design sample ${number}`
-      : `Social media content design sample ${number}`,
-    label: `${isCanva ? "Canva design" : "Social media sample"} ${String(number).padStart(2, "0")}`,
-  }));
 
   useEffect(() => {
-    if (activeImage === null) return undefined;
     const previousFocus = document.activeElement;
     document.body.classList.add("lightbox-open");
     closeButtonRef.current?.focus();
 
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") setActiveImage(null);
+      if (event.key === "Escape") onClose();
       if (event.key === "Tab") {
         event.preventDefault();
         closeButtonRef.current?.focus();
@@ -321,7 +344,28 @@ function ProjectSocial() {
       window.removeEventListener("keydown", handleKeyDown);
       previousFocus?.focus();
     };
-  }, [activeImage]);
+  }, [onClose]);
+
+  return createPortal(
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label={`${image.label} enlarged`} onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <button ref={closeButtonRef} className="lightbox-close" type="button" onClick={onClose} aria-label="Close enlarged image"><CloseIcon className="ui-icon" /></button>
+      <img className="lightbox-image" src={image.src} alt={image.alt} />
+    </div>,
+    document.body,
+  );
+}
+
+function ProjectSocial() {
+  const [sampleType, setSampleType] = useState("canva");
+  const [activeImage, setActiveImage] = useState(null);
+  const isCanva = sampleType === "canva";
+  const samples = [1, 2, 3, 4].map((number) => ({
+    src: isCanva ? `/${number}.png` : `/social-media-sample/${number}.png`,
+    alt: isCanva
+      ? `Canva promotional graphic design sample ${number}`
+      : `Social media content design sample ${number}`,
+    label: `${isCanva ? "Canva design" : "Social media sample"} ${String(number).padStart(2, "0")}`,
+  }));
 
   function changeSampleType(type) {
     setActiveImage(null);
@@ -358,13 +402,7 @@ function ProjectSocial() {
           ))}
         </div>
       </div>
-      {activeImage !== null && createPortal(
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label={`${samples[activeImage].label} enlarged`} onClick={(event) => { if (event.target === event.currentTarget) setActiveImage(null); }}>
-          <button ref={closeButtonRef} className="lightbox-close" type="button" onClick={() => setActiveImage(null)} aria-label="Close enlarged image"><CloseIcon className="ui-icon" /></button>
-          <img className="lightbox-image" src={samples[activeImage].src} alt={samples[activeImage].alt} />
-        </div>,
-        document.body,
-      )}
+      {activeImage !== null && <ImageLightbox image={samples[activeImage]} onClose={() => setActiveImage(null)} />}
     </>
   );
 }
@@ -394,7 +432,7 @@ function Portfolio() {
         <div className="section-heading work-heading reveal">
           <p className="section-number">07 / Portfolio</p>
           <h2 id="work-title">A look at <em>what I can do</em></h2>
-          <p>Demonstration projects that show how I think, organize information, and support day-to-day business needs.</p>
+          <div className="work-intro"><p>Demonstration projects that show how I think, organize information, and support day-to-day business needs.</p><div className="work-shortcuts"><a href="#reels">Reels & videos <SouthEastIcon className="ui-icon" /></a><a href="#audio-mixing">Audio mixing <SouthEastIcon className="ui-icon" /></a></div></div>
         </div>
         <div className="project-tabs reveal">
           <div className="tab-list" role="tablist" aria-label="Portfolio projects">
@@ -417,6 +455,107 @@ function Portfolio() {
           </article>
         </div>
       </div>
+    </section>
+  );
+}
+
+function ReelsPortfolio() {
+  const videoRefs = useRef([]);
+
+  function handlePlay(activeVideo) {
+    videoRefs.current.forEach((video) => {
+      if (video && video !== activeVideo) video.pause();
+    });
+  }
+
+  return (
+    <section className="reels section-light" id="reels" aria-labelledby="reels-title">
+      <div className="page-shell">
+        <SectionHeading number="07A / Video Portfolio" title="Sample Reels &" emphasis="Videos" text="A selection of business, daily vlog, and quote videos. Press play to watch each sample here." headingId="reels-title" />
+        <div className="reel-grid">
+          {videoSamples.map((sample, index) => {
+            const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
+            return (
+              <figure className="reel-card reveal" key={sample.file}>
+                <video ref={(video) => { videoRefs.current[index] = video; }} controls playsInline preload="metadata" aria-label={sample.title} onPlay={(event) => handlePlay(event.currentTarget)}>
+                  <source src={src} type="video/mp4" />
+                  Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
+                </video>
+                <figcaption><span className="reel-type">{sample.type}</span><h3>{sample.title}</h3><a href={src} target="_blank" rel="noopener noreferrer">Open video <NorthEastIcon className="ui-icon" /></a></figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SpotifyPlayerDialog({ artist, onClose }) {
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement;
+    dialog.showModal();
+    document.body.classList.add("lightbox-open");
+    return () => {
+      dialog.close();
+      document.body.classList.remove("lightbox-open");
+      previousFocus?.focus();
+    };
+  }, []);
+
+  function handleBackdropClick(event) {
+    if (event.target !== event.currentTarget) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) onClose();
+  }
+
+  return createPortal(
+    <dialog ref={dialogRef} className="music-player-dialog" aria-labelledby="music-player-title" onCancel={(event) => { event.preventDefault(); onClose(); }} onClick={handleBackdropClick}>
+      <button type="button" className="music-player-close" onClick={onClose} aria-label="Close music player" autoFocus><CloseIcon className="ui-icon" /></button>
+      <p className="music-player-label"><HeadphonesRoundedIcon className="ui-icon" /> Artist spotlight</p>
+      <h3 id="music-player-title">Listen to {artist.name}</h3>
+      <iframe src={`https://open.spotify.com/embed/artist/${artist.spotifyId}`} title={`${artist.name} Spotify music player`} width="100%" height="352" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowFullScreen />
+      <p className="music-player-note">Playback is provided by Spotify. <a href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer">Open in Spotify <NorthEastIcon className="ui-icon" /></a></p>
+    </dialog>,
+    document.body,
+  );
+}
+
+function AudioPortfolio() {
+  const [activeArtist, setActiveArtist] = useState(null);
+  const [playingArtist, setPlayingArtist] = useState(null);
+
+  return (
+    <section className="audio-mixing section-cream" id="audio-mixing" aria-labelledby="audio-title">
+      <div className="page-shell">
+        <SectionHeading number="07B / Audio Portfolio" title="Audio Mixing" emphasis="Portfolio" text="As an Audio & Sound Mixing Engineer, these are the artists I’ve worked with in the past. Explore their music on Spotify." headingId="audio-title" className="audio-intro-heading" />
+        <div className="audio-credits reveal"><span className="credits-icon" aria-hidden="true"><CheckIcon className="ui-icon" /></span><div><h3>Find my name in the song credits.</h3><p>Look for <strong>Jadr Panes</strong> in the credits of releases I’ve worked on. Open an artist’s Spotify profile below, choose a song, and check its credits.</p></div></div>
+        <div className="artist-grid">
+          {audioArtists.map((artist, index) => (
+            <article className="artist-card reveal" key={artist.name}>
+              <div className="artist-player-label"><span><HeadphonesRoundedIcon className="ui-icon" /> Artist collaboration</span><span>{String(index + 1).padStart(2, "0")} / 05</span></div>
+              <button type="button" className="artist-image-button" onClick={() => setActiveArtist(artist)} aria-label={`Enlarge ${artist.name} artist image`}>
+                <img src={artist.src} alt={artist.alt} loading="lazy" />
+                <span className="zoom-hint" aria-hidden="true">View <NorthEastIcon className="ui-icon" /></span>
+              </button>
+              <div className="artist-copy"><h3>{artist.name}</h3><p>Audio & Sound Mixing</p></div>
+              <div className="artist-waveform" aria-hidden="true">{[25, 45, 30, 65, 85, 50, 100, 70, 40, 75, 55, 90, 65, 35, 80, 100, 60, 40, 75, 50, 90, 65, 40, 80, 55, 30, 65, 45, 25].map((height, bar) => <span key={bar} style={{ "--bar-height": `${height}%` }} />)}</div>
+              <div className="artist-player-controls">
+                <button type="button" className="artist-secondary-control" onClick={() => setActiveArtist(artist)} aria-label={`View ${artist.name} artwork`} title="View artwork"><OpenInFullRoundedIcon className="ui-icon" /></button>
+                <button type="button" className="artist-play-control" onClick={() => setPlayingArtist(artist)} aria-label={`Open ${artist.name} Spotify player`} title={`Listen to ${artist.name}`}><PlayArrowRoundedIcon className="ui-icon" /></button>
+                <a className="artist-secondary-control" href={`https://open.spotify.com/artist/${artist.spotifyId}`} target="_blank" rel="noopener noreferrer" aria-label={`Open ${artist.name} on Spotify (opens in a new tab)`} title="Open in Spotify"><NorthEastIcon className="ui-icon" /></a>
+              </div>
+              <button type="button" className="artist-listen-label" onClick={() => setPlayingArtist(artist)}>Listen on Spotify</button>
+              <p className="artist-mixing-credit">Jadr Panes <span aria-hidden="true">·</span> Audio & Sound Mixing</p>
+            </article>
+          ))}
+        </div>
+      </div>
+      {activeArtist && <ImageLightbox image={activeArtist} onClose={() => setActiveArtist(null)} />}
+      {playingArtist && <SpotifyPlayerDialog artist={playingArtist} onClose={() => setPlayingArtist(null)} />}
     </section>
   );
 }
@@ -456,7 +595,7 @@ function FinalCTA() {
         <h2 id="final-cta-title">Have tasks that are taking too much <em>of your time?</em></h2>
         <p className="final-cta-lede">Let me help you get them done.</p>
         <p>Whether you need help with:</p>
-        <ul className="skill-tags"><li>Customer Support</li><li>Administrative Tasks</li><li>CRM & Data</li><li>Email Management</li><li>Canva & Social Media</li></ul>
+        <ul className="skill-tags"><li>Customer Support</li><li>Administrative Tasks</li><li>CRM & Data</li><li>Email Management</li><li>Canva & Social Media</li><li>Reels & Videos</li><li>Audio & Sound Mixing</li></ul>
         <p>Let’s talk.</p>
         <a className="button button-dark" href="#contact">Let’s work together <span aria-hidden="true"><NorthEastIcon className="ui-icon" /></span></a>
       </div>
@@ -554,14 +693,14 @@ export default function App() {
         <section className="hero section-dark" id="home" aria-labelledby="hero-title">
           <div className="hero-grid page-shell">
             <div className="hero-copy reveal">
-              <p className="eyebrow">Virtual assistant <span aria-hidden="true"><CircleIcon className="ui-icon" /></span> Customer support <span aria-hidden="true"><CircleIcon className="ui-icon" /></span> Administrative support</p>
+              <p className="eyebrow hero-eyebrow">{["Virtual assistant", "Customer support", "Administrative support", "Social Media Manager", "Audio & Sound Mixing Engineer"].map((role, index) => <span className="hero-role" key={role}>{role}{index < 4 && <span className="role-separator" aria-hidden="true"><CircleIcon className="ui-icon" /></span>}</span>)}</p>
               <h1 id="hero-title">The reliable support <em>behind your business.</em></h1>
-              <p className="hero-intro">Hi, I'm Jadr Panes, a Virtual Assistant with professional experience in customer service, account support, administrative assistance, CRM management, data entry, email management, and digital content support.</p>
+              <p className="hero-intro">Hi, I’m Jadr Panes, a Virtual Assistant with professional experience in customer service, account support, administrative assistance, CRM management, data entry, email management, social media marketing, Graphic designing, and Audio and Sound Mixing Engineer</p>
               <div className="hero-actions"><a className="button button-accent" href="#services">View my services <span aria-hidden="true"><ArrowDownwardIcon className="ui-icon" /></span></a><a className="button button-ghost" href="#contact">Let’s work together <span aria-hidden="true"><NorthEastIcon className="ui-icon" /></span></a></div>
               <ul className="hero-notes" aria-label="Quick details"><li><CheckIcon className="ui-icon" />Philippines-based</li><li><CheckIcon className="ui-icon" />Available remotely</li><li><CheckIcon className="ui-icon" />Privacy-conscious</li></ul>
             </div>
             <div className="hero-visual reveal">
-              <div className="hero-image-frame"><img src="/jadr-photos/3.png" alt="Jadr Panes seated on outdoor steps" /></div>
+              <div className="hero-image-frame"><img src="/jadr-photos/jadr-formal/formal%20(1).png" alt="Formal portrait of Jadr Panes in a white shirt and black tie" fetchPriority="high" /></div>
               <div className="hero-stamp" aria-hidden="true"><span>Organized</span><strong>Ready</strong><span>Responsive</span></div>
               <div className="availability-card"><span className="status-dot" aria-hidden="true"><CircleIcon className="ui-icon" /></span><p><small>Current status</small><strong>Open to remote opportunities</strong></p></div>
             </div>
@@ -574,15 +713,15 @@ export default function App() {
             <div><span>01</span><strong>Customer support</strong><small>Automotive + Financial Accounts</small></div>
             <div><span>02</span><strong>Administrative</strong><small>CRM + Data + Documentation</small></div>
             <div><span>03</span><strong>Digital</strong><small>Canva + Social Media + Content</small></div>
-            <div><span>04</span><strong>Remote</strong><small>Las Piñas, Philippines</small></div>
+            <div><span>04</span><strong>Audio & Sound Mixing</strong><small>Artist Collaborations + FL Studio</small></div>
           </div>
         </section>
 
         <section className="about section-light" id="about" aria-labelledby="about-title">
           <div className="page-shell about-grid">
             <div className="section-intro reveal"><p className="section-number">03 / About Me</p><h2 id="about-title">A little <em>about me</em></h2></div>
-            <div className="about-copy reveal"><p className="lede">Professional experience. Practical support. A client-first mindset.</p><p>I’m Jadr Panes, a Virtual Assistant with a professional background in customer service and account support. I’ve supported automotive and financial accounts where accuracy, communication, documentation, privacy, and problem-solving are essential.</p><p>I now bring those skills into virtual assistance—helping businesses manage everyday tasks, customer communication, information, and digital support with care.</p><a className="text-link" href="#experience">See my professional journey <span aria-hidden="true"><SouthEastIcon className="ui-icon" /></span></a></div>
-            <figure className="about-photo reveal"><img src="/jadr-photos/5.png" alt="Portrait of Jadr Panes against a vivid magenta background" loading="lazy" /><figcaption>Based in Las Piñas City<br />Working remotely worldwide</figcaption></figure>
+            <div className="about-copy reveal"><p className="lede">Professional experience. Practical support. A client-first mindset.</p><p>I’m Jadr Panes, a Virtual Assistant with a professional background in customer service and account support. I’ve supported automotive and financial accounts where accuracy, communication, documentation, privacy, and problem-solving are essential.</p><p>I now bring those skills into virtual assistance—helping businesses manage everyday tasks, customer communication, information, and digital support with care.</p><p>I also work as a Social Media Manager and Audio & Sound Mixing Engineer, bringing social media marketing, graphic design, and audio mixing into my creative services.</p><a className="text-link" href="#experience">See my professional journey <span aria-hidden="true"><SouthEastIcon className="ui-icon" /></span></a></div>
+            <figure className="about-photo reveal"><img src="/jadr-photos/jadr-formal/formal%20(6).png" alt="Jadr Panes seated in formal attire against a charcoal studio background" loading="lazy" /><figcaption>Based in Las Piñas City<br />Working remotely worldwide</figcaption></figure>
           </div>
         </section>
 
@@ -597,6 +736,8 @@ export default function App() {
 
         <Experience />
         <Portfolio />
+        <ReelsPortfolio />
+        <AudioPortfolio />
 
         <section className="process section-cream" id="process" aria-labelledby="process-title">
           <div className="page-shell process-grid">
