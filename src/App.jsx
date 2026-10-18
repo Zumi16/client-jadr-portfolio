@@ -12,6 +12,13 @@ import CircleIcon from "@mui/icons-material/Circle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
+import VolumeOffRoundedIcon from "@mui/icons-material/VolumeOffRounded";
+import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import SmartDisplayRoundedIcon from "@mui/icons-material/SmartDisplayRounded";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import HeadphonesRoundedIcon from "@mui/icons-material/HeadphonesRounded";
 
 const navItems = [
@@ -458,16 +465,85 @@ function Portfolio() {
   );
 }
 
+function ReelVideoModal({ sample, initialTime, initialMuted, initialPlaying, onClose }) {
+  const dialogRef = useRef(null);
+  const videoRef = useRef(null);
+  const closeRef = useRef(null);
+  const [muted, setMuted] = useState(initialMuted);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const video = videoRef.current;
+    const previousFocus = document.activeElement;
+    const previousScroll = window.scrollY;
+    const previousPadding = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = `${parseFloat(getComputedStyle(document.body).paddingRight) + scrollbarWidth}px`;
+    document.body.classList.add("reel-video-open");
+    dialog.showModal();
+    closeRef.current?.focus({ preventScroll: true });
+    const pauseWhenHidden = () => { if (document.hidden) video.pause(); };
+    document.addEventListener("visibilitychange", pauseWhenHidden);
+    return () => {
+      video.pause();
+      dialog.close();
+      document.removeEventListener("visibilitychange", pauseWhenHidden);
+      document.body.classList.remove("reel-video-open");
+      document.body.style.paddingRight = previousPadding;
+      window.scrollTo({ top: previousScroll, behavior: "instant" });
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, []);
+
+  function closeVideo() {
+    const video = videoRef.current;
+    const playback = { time: video.currentTime, muted: video.muted, playing: !video.paused };
+    video.pause();
+    onClose(playback);
+  }
+
+  function handleKeyDown(event) {
+    if (event.key !== "Tab") return;
+    const buttons = [...dialogRef.current.querySelectorAll("button")];
+    const first = buttons[0];
+    const last = buttons[buttons.length - 1];
+    if ((event.shiftKey && document.activeElement === first) || (!event.shiftKey && document.activeElement === last)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+    }
+  }
+
+  return createPortal(
+    <dialog className="reel-video-modal" ref={dialogRef} aria-label={`${sample.title} enlarged video`} onKeyDown={handleKeyDown} onCancel={(event) => { event.preventDefault(); closeVideo(); }} onClick={(event) => { if (event.target === event.currentTarget) closeVideo(); }}>
+      <button className="reel-video-modal-close" type="button" ref={closeRef} onClick={closeVideo} aria-label="Close enlarged video"><CloseIcon className="ui-icon" /></button>
+      <video className="reel-enlarged-video" ref={videoRef} src={`/sample-reels-videos/${encodeURIComponent(sample.file)}`} playsInline loop muted={muted} preload="auto" aria-label={sample.title} onLoadedMetadata={(event) => {
+        event.currentTarget.currentTime = Math.min(initialTime, event.currentTarget.duration || initialTime);
+        if (initialPlaying) event.currentTarget.play().catch(() => {});
+      }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+      <div className="reel-video-modal-controls" role="group" aria-label="Video playback">
+        <button type="button" onClick={() => { const video = videoRef.current; if (video.paused) video.play().catch(() => {}); else video.pause(); }} aria-label={`${playing ? "Pause" : "Play"} enlarged video`}>{playing ? <PauseRoundedIcon className="ui-icon" /> : <PlayArrowRoundedIcon className="ui-icon" />}</button>
+        <button type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? "Unmute enlarged video" : "Mute enlarged video"}>{muted ? <VolumeOffRoundedIcon className="ui-icon" /> : <VolumeUpRoundedIcon className="ui-icon" />}</button>
+      </div>
+    </dialog>,
+    document.body,
+  );
+}
+
 function ReelsPortfolio() {
   const feedRef = useRef(null);
   const scrollTrackRef = useRef(null);
   const viewerRef = useRef(null);
   const scrollStepRef = useRef(1);
   const videoRefs = useRef([]);
+  const restoredPlaybackRef = useRef(null);
   const [activeReel, setActiveReel] = useState(0);
   const [feedVisible, setFeedVisible] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [playingReel, setPlayingReel] = useState(null);
+  const [openedVideo, setOpenedVideo] = useState(null);
   const activeSample = videoSamples[activeReel];
+  const isPlaying = playingReel === activeReel;
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
@@ -478,16 +554,18 @@ function ReelsPortfolio() {
   }, []);
 
   useEffect(() => {
+    const restoredPlayback = restoredPlaybackRef.current;
+    restoredPlaybackRef.current = null;
     videoRefs.current.forEach((video, index) => {
       if (!video) return;
-      if (index !== activeReel || !feedVisible || document.hidden) {
+      if (index !== activeReel || !feedVisible || document.hidden || openedVideo) {
         video.pause();
-      } else if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      } else if (restoredPlayback ? restoredPlayback.playing : !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         // Browsers may require a tap before allowing playback, especially with sound.
         video.play().catch(() => {});
       }
     });
-  }, [activeReel, feedVisible]);
+  }, [activeReel, feedVisible, openedVideo]);
 
   useEffect(() => {
     const pauseWhenHidden = () => {
@@ -552,10 +630,34 @@ function ReelsPortfolio() {
     }
   }
 
-  function handlePlay(activeVideo) {
+  function handlePlay(activeVideo, index) {
     videoRefs.current.forEach((video) => {
       if (video && video !== activeVideo) video.pause();
     });
+    setPlayingReel(index);
+  }
+
+  function toggleReelPlayback() {
+    const video = videoRefs.current[activeReel];
+    if (!video) return;
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
+  }
+
+  function openReelVideo() {
+    const video = videoRefs.current[activeReel];
+    if (!video) return;
+    const playback = { sample: activeSample, index: activeReel, time: video.currentTime, muted: video.muted, playing: !video.paused };
+    video.pause();
+    setOpenedVideo(playback);
+  }
+
+  function closeReelVideo(playback) {
+    const video = videoRefs.current[openedVideo.index];
+    if (video?.readyState >= 1) video.currentTime = Math.min(playback.time, video.duration || playback.time);
+    setMuted(playback.muted);
+    restoredPlaybackRef.current = playback;
+    setOpenedVideo(null);
   }
 
   return (
@@ -564,42 +666,52 @@ function ReelsPortfolio() {
         <div className="reels-heading">
           <p className="section-number">07A / Video Portfolio</p>
           <h2 id="reels-title">Sample Reels &amp; <em>Videos</em></h2>
-          <p>A selection of business, daily vlog, and quote videos. Keep scrolling down the page to watch the next reel.</p>
+          <p>A selection of business, daily vlog, and quote videos. Scroll to move from one reel to the next.</p>
           <p className="reels-scroll-hint"><ArrowDownwardIcon className="ui-icon" /> Scroll down to explore the reels</p>
+          <p className="reels-viewing-note">Tap the phone to watch a larger video. Use the play and sound buttons to control the preview.</p>
         </div>
         <div className="reels-scroll-track" ref={scrollTrackRef}>
-        <div className="reel-viewer" ref={viewerRef}>
-          <div className="reel-viewer-heading"><span>Reels</span><p id="reel-instructions">Keep scrolling <ArrowDownwardIcon className="ui-icon" /></p></div>
-          <div className="reel-feed-layout">
-            <div className="reel-feed" id="reel-feed" ref={feedRef} role="region" aria-label="Sample reels video feed" aria-describedby="reel-instructions" tabIndex={0} onKeyDown={handleFeedKeyDown}>
-              <div className="reel-stack" style={{ transform: `translateY(-${activeReel * 100}%)` }}>
-              {videoSamples.map((sample, index) => {
-                const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
-                return (
-                  <figure className="reel-card" key={sample.file} aria-label={`${sample.title}, reel ${index + 1} of ${videoSamples.length}`} aria-hidden={index !== activeReel} inert={index !== activeReel}>
-                    <video ref={(video) => { videoRefs.current[index] = video; }} controls playsInline loop muted={muted} preload="metadata" aria-label={sample.title} tabIndex={index === activeReel ? 0 : -1} onPlay={(event) => handlePlay(event.currentTarget)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)}>
-                      <source src={src} type="video/mp4" />
-                      Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
-                    </video>
-                  </figure>
-                );
-              })}
+          <div className="reel-viewer" ref={viewerRef}>
+            <p className="sr-only" id="reel-instructions">Scroll down the page to advance through the reels, or scroll up to return to a previous reel.</p>
+            <div className="reel-feed-layout">
+              <div className="reel-phone" role="group" aria-label="Phone reel player">
+                <div className="reel-feed" id="reel-feed" ref={feedRef} role="region" aria-label="Sample reels video feed" aria-describedby="reel-instructions" tabIndex={0} onKeyDown={handleFeedKeyDown}>
+                  <div className="reel-stack" style={{ transform: `translateY(-${activeReel * 100}%)` }}>
+                    {videoSamples.map((sample, index) => {
+                      const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
+                      return (
+                        <figure className="reel-card" key={sample.file} aria-label={`${sample.title}, reel ${index + 1} of ${videoSamples.length}`} aria-hidden={index !== activeReel} inert={index !== activeReel}>
+                          <video ref={(video) => { videoRefs.current[index] = video; }} playsInline loop muted={muted} preload="metadata" disablePictureInPicture disableRemotePlayback aria-label={sample.title} onPlay={(event) => handlePlay(event.currentTarget, index)} onPause={() => setPlayingReel((playing) => playing === index ? null : playing)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)}>
+                            <source src={src} type="video/mp4" />
+                            Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
+                          </video>
+                          <figcaption className="reel-screen-caption"><span>Jadr Panes</span><h3>{sample.title}</h3><p>{sample.type}</p></figcaption>
+                        </figure>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="reel-app-nav" aria-hidden="true">
+                  <span><HomeOutlinedIcon className="ui-icon" /></span>
+                  <span className="is-selected"><SmartDisplayRoundedIcon className="ui-icon" /></span>
+                  <span><SendOutlinedIcon className="ui-icon reel-message-icon" /></span>
+                  <span><SearchRoundedIcon className="ui-icon" /></span>
+                  <span><span className="reel-app-avatar"><img src="/jadr-photos/jadr-formal/formal%20(1).png" alt="" /><span className="reel-app-dot" /></span></span>
+                </div>
+                <button className="reel-video-link" type="button" onClick={openReelVideo} aria-label={`Enlarge ${activeSample.title} video`} aria-haspopup="dialog"><span className="reel-video-open-hint"><PlayArrowRoundedIcon className="ui-icon" /></span></button>
+                <span className="reel-phone-island" aria-hidden="true"><span /></span>
+                <span className="reel-phone-home" aria-hidden="true" />
+                <div className="reel-screen-header"><span className="reel-counter" aria-live="polite" aria-atomic="true"><span className="sr-only">Reel </span>{String(activeReel + 1).padStart(2, "0")}<span aria-hidden="true"> / </span><span className="sr-only"> of </span>{String(videoSamples.length).padStart(2, "0")}</span></div>
+                <div className="reel-player-actions" role="group" aria-label="Video playback">
+                  <button type="button" onClick={toggleReelPlayback} aria-label={`${isPlaying ? "Pause" : "Play"} ${activeSample.title}`} title={isPlaying ? "Pause" : "Play"} aria-controls="reel-feed">{isPlaying ? <PauseRoundedIcon className="ui-icon" /> : <PlayArrowRoundedIcon className="ui-icon" />}</button>
+                  <button type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? "Unmute reel" : "Mute reel"} title={muted ? "Turn sound on" : "Turn sound off"} aria-controls="reel-feed">{muted ? <VolumeOffRoundedIcon className="ui-icon" /> : <VolumeUpRoundedIcon className="ui-icon" />}</button>
+                </div>
               </div>
             </div>
-            <div className="reel-navigation" aria-label="Reel navigation">
-              <button type="button" onClick={() => scrollToReel(activeReel - 1)} disabled={activeReel === 0} aria-label="Previous reel" aria-controls="reel-feed"><ArrowUpwardIcon className="ui-icon" /></button>
-              <span className="reel-counter" aria-live="polite" aria-atomic="true"><span className="sr-only">Reel </span>{String(activeReel + 1).padStart(2, "0")}<span aria-hidden="true"> / </span><span className="sr-only"> of </span>{String(videoSamples.length).padStart(2, "0")}</span>
-              <button type="button" onClick={() => scrollToReel(activeReel + 1)} disabled={activeReel === videoSamples.length - 1} aria-label="Next reel" aria-controls="reel-feed"><ArrowDownwardIcon className="ui-icon" /></button>
-            </div>
           </div>
-          <div className="reel-caption">
-            <div><span className="reel-type">{activeSample.type}</span><h3>{activeSample.title}</h3></div>
-            <a href={`/sample-reels-videos/${encodeURIComponent(activeSample.file)}`} target="_blank" rel="noopener noreferrer">Open video <NorthEastIcon className="ui-icon" /></a>
-          </div>
-          <p className="reel-playback-note">Starts muted. Use the video controls for sound, pause, or fullscreen.</p>
-        </div>
         </div>
       </div>
+      {openedVideo && <ReelVideoModal sample={openedVideo.sample} initialTime={openedVideo.time} initialMuted={openedVideo.muted} initialPlaying={openedVideo.playing} onClose={closeReelVideo} />}
     </section>
   );
 }
