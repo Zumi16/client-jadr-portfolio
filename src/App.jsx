@@ -459,7 +459,98 @@ function Portfolio() {
 }
 
 function ReelsPortfolio() {
+  const feedRef = useRef(null);
+  const scrollTrackRef = useRef(null);
+  const viewerRef = useRef(null);
+  const scrollStepRef = useRef(1);
   const videoRefs = useRef([]);
+  const [activeReel, setActiveReel] = useState(0);
+  const [feedVisible, setFeedVisible] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const activeSample = videoSamples[activeReel];
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setFeedVisible(entry.isIntersecting && entry.intersectionRatio >= .55);
+    }, { threshold: [0, .55], rootMargin: "-72px 0px 0px" });
+    observer.observe(feedRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      if (index !== activeReel || !feedVisible || document.hidden) {
+        video.pause();
+      } else if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        // Browsers may require a tap before allowing playback, especially with sound.
+        video.play().catch(() => {});
+      }
+    });
+  }, [activeReel, feedVisible]);
+
+  useEffect(() => {
+    const pauseWhenHidden = () => {
+      if (document.hidden) videoRefs.current.forEach((video) => video?.pause());
+    };
+    document.addEventListener("visibilitychange", pauseWhenHidden);
+    return () => {
+      document.removeEventListener("visibilitychange", pauseWhenHidden);
+      videoRefs.current.forEach((video) => video?.pause());
+    };
+  }, []);
+
+  useEffect(() => {
+    const track = scrollTrackRef.current;
+    const viewer = viewerRef.current;
+    let frame = 0;
+    function updateActiveReel() {
+      frame = 0;
+      const stickyTop = parseFloat(getComputedStyle(viewer).top) || 0;
+      const progress = (stickyTop - track.getBoundingClientRect().top) / scrollStepRef.current;
+      setActiveReel(Math.max(0, Math.min(videoSamples.length - 1, Math.round(progress))));
+    }
+    function handlePageScroll() {
+      if (!frame) frame = window.requestAnimationFrame(updateActiveReel);
+    }
+    function measureTrack() {
+      scrollStepRef.current = Math.max(320, viewer.offsetHeight * .9);
+      // Real document height drives the sequence, without trapping wheel or touch events.
+      track.style.height = `${viewer.offsetHeight + (videoSamples.length - 1) * scrollStepRef.current}px`;
+      handlePageScroll();
+    }
+    const observer = new ResizeObserver(measureTrack);
+    observer.observe(viewer);
+    window.addEventListener("scroll", handlePageScroll, { passive: true });
+    window.addEventListener("resize", measureTrack);
+    measureTrack();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handlePageScroll);
+      window.removeEventListener("resize", measureTrack);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  function scrollToReel(index) {
+    const track = scrollTrackRef.current;
+    if (!track) return;
+    const nextIndex = Math.max(0, Math.min(videoSamples.length - 1, index));
+    const stickyTop = parseFloat(getComputedStyle(viewerRef.current).top) || 0;
+    window.scrollTo({
+      top: window.scrollY + track.getBoundingClientRect().top - stickyTop + nextIndex * scrollStepRef.current,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }
+
+  function handleFeedKeyDown(event) {
+    if (event.target !== event.currentTarget) return;
+    const destinations = { ArrowDown: activeReel + 1, PageDown: activeReel + 1, ArrowUp: activeReel - 1, PageUp: activeReel - 1, Home: 0, End: videoSamples.length - 1 };
+    if (event.key in destinations) {
+      event.preventDefault();
+      scrollToReel(destinations[event.key]);
+    }
+  }
 
   function handlePlay(activeVideo) {
     videoRefs.current.forEach((video) => {
@@ -469,21 +560,44 @@ function ReelsPortfolio() {
 
   return (
     <section className="reels section-light" id="reels" aria-labelledby="reels-title">
-      <div className="page-shell">
-        <SectionHeading number="07A / Video Portfolio" title="Sample Reels &" emphasis="Videos" text="A selection of business, daily vlog, and quote videos. Press play to watch each sample here." headingId="reels-title" />
-        <div className="reel-grid">
-          {videoSamples.map((sample, index) => {
-            const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
-            return (
-              <figure className="reel-card reveal" key={sample.file}>
-                <video ref={(video) => { videoRefs.current[index] = video; }} controls playsInline preload="metadata" aria-label={sample.title} onPlay={(event) => handlePlay(event.currentTarget)}>
-                  <source src={src} type="video/mp4" />
-                  Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
-                </video>
-                <figcaption><span className="reel-type">{sample.type}</span><h3>{sample.title}</h3><a href={src} target="_blank" rel="noopener noreferrer">Open video <NorthEastIcon className="ui-icon" /></a></figcaption>
-              </figure>
-            );
-          })}
+      <div className="page-shell reels-layout">
+        <div className="reels-heading">
+          <p className="section-number">07A / Video Portfolio</p>
+          <h2 id="reels-title">Sample Reels &amp; <em>Videos</em></h2>
+          <p>A selection of business, daily vlog, and quote videos. Keep scrolling down the page to watch the next reel.</p>
+          <p className="reels-scroll-hint"><ArrowDownwardIcon className="ui-icon" /> Scroll down to explore the reels</p>
+        </div>
+        <div className="reels-scroll-track" ref={scrollTrackRef}>
+        <div className="reel-viewer" ref={viewerRef}>
+          <div className="reel-viewer-heading"><span>Reels</span><p id="reel-instructions">Keep scrolling <ArrowDownwardIcon className="ui-icon" /></p></div>
+          <div className="reel-feed-layout">
+            <div className="reel-feed" id="reel-feed" ref={feedRef} role="region" aria-label="Sample reels video feed" aria-describedby="reel-instructions" tabIndex={0} onKeyDown={handleFeedKeyDown}>
+              <div className="reel-stack" style={{ transform: `translateY(-${activeReel * 100}%)` }}>
+              {videoSamples.map((sample, index) => {
+                const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
+                return (
+                  <figure className="reel-card" key={sample.file} aria-label={`${sample.title}, reel ${index + 1} of ${videoSamples.length}`} aria-hidden={index !== activeReel} inert={index !== activeReel}>
+                    <video ref={(video) => { videoRefs.current[index] = video; }} controls playsInline loop muted={muted} preload="metadata" aria-label={sample.title} tabIndex={index === activeReel ? 0 : -1} onPlay={(event) => handlePlay(event.currentTarget)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)}>
+                      <source src={src} type="video/mp4" />
+                      Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
+                    </video>
+                  </figure>
+                );
+              })}
+              </div>
+            </div>
+            <div className="reel-navigation" aria-label="Reel navigation">
+              <button type="button" onClick={() => scrollToReel(activeReel - 1)} disabled={activeReel === 0} aria-label="Previous reel" aria-controls="reel-feed"><ArrowUpwardIcon className="ui-icon" /></button>
+              <span className="reel-counter" aria-live="polite" aria-atomic="true"><span className="sr-only">Reel </span>{String(activeReel + 1).padStart(2, "0")}<span aria-hidden="true"> / </span><span className="sr-only"> of </span>{String(videoSamples.length).padStart(2, "0")}</span>
+              <button type="button" onClick={() => scrollToReel(activeReel + 1)} disabled={activeReel === videoSamples.length - 1} aria-label="Next reel" aria-controls="reel-feed"><ArrowDownwardIcon className="ui-icon" /></button>
+            </div>
+          </div>
+          <div className="reel-caption">
+            <div><span className="reel-type">{activeSample.type}</span><h3>{activeSample.title}</h3></div>
+            <a href={`/sample-reels-videos/${encodeURIComponent(activeSample.file)}`} target="_blank" rel="noopener noreferrer">Open video <NorthEastIcon className="ui-icon" /></a>
+          </div>
+          <p className="reel-playback-note">Starts muted. Use the video controls for sound, pause, or fullscreen.</p>
+        </div>
         </div>
       </div>
     </section>
