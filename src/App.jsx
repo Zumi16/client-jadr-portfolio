@@ -539,7 +539,7 @@ function ReelsPortfolio() {
   const restoredPlaybackRef = useRef(null);
   const [activeReel, setActiveReel] = useState(0);
   const [feedVisible, setFeedVisible] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [playingReel, setPlayingReel] = useState(null);
   const [openedVideo, setOpenedVideo] = useState(null);
   const activeSample = videoSamples[activeReel];
