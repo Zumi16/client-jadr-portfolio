@@ -554,6 +554,7 @@ function ReelsPortfolio() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     const restoredPlayback = restoredPlaybackRef.current;
     restoredPlaybackRef.current = null;
     videoRefs.current.forEach((video, index) => {
@@ -561,10 +562,23 @@ function ReelsPortfolio() {
       if (index !== activeReel || !feedVisible || document.hidden || openedVideo) {
         video.pause();
       } else if (restoredPlayback ? restoredPlayback.playing : !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        // Browsers may require a tap before allowing playback, especially with sound.
-        video.play().catch(() => {});
+        // Prefer sound, but mobile browsers can reject audible autoplay even while scrolling.
+        video.play().catch(async (error) => {
+          if (error.name !== "NotAllowedError" || cancelled || document.hidden) return;
+          video.muted = true;
+          setMuted(true);
+          try {
+            await video.play();
+          } catch {
+            // Low-power/data-saving modes may still require the existing play button.
+          }
+        });
       }
     });
+    return () => {
+      cancelled = true;
+      videoRefs.current[activeReel]?.pause();
+    };
   }, [activeReel, feedVisible, openedVideo]);
 
   useEffect(() => {
@@ -586,15 +600,21 @@ function ReelsPortfolio() {
       frame = 0;
       const stickyTop = parseFloat(getComputedStyle(viewer).top) || 0;
       const progress = (stickyTop - track.getBoundingClientRect().top) / scrollStepRef.current;
-      setActiveReel(Math.max(0, Math.min(videoSamples.length - 1, Math.round(progress))));
+      setActiveReel(Math.max(0, Math.min(videoSamples.length - 1, Math.floor(progress))));
     }
     function handlePageScroll() {
       if (!frame) frame = window.requestAnimationFrame(updateActiveReel);
     }
     function measureTrack() {
-      scrollStepRef.current = Math.max(320, viewer.offsetHeight * .9);
-      // Real document height drives the sequence, without trapping wheel or touch events.
-      track.style.height = `${viewer.offsetHeight + (videoSamples.length - 1) * scrollStepRef.current}px`;
+      // Touch scrolling carries momentum: reserve substantially more page distance
+      // per reel so a normal mobile flick doesn't rush through the sequence.
+      const touchLayout = window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+      scrollStepRef.current = touchLayout
+        ? Math.max(1600, viewer.offsetHeight * 3)
+        : Math.max(600, viewer.offsetHeight * 1.15);
+      // Give every reel (including the first and last) a full scroll interval.
+      // Real document height drives the sequence without trapping wheel or touch events.
+      track.style.height = `${viewer.offsetHeight + videoSamples.length * scrollStepRef.current}px`;
       handlePageScroll();
     }
     const observer = new ResizeObserver(measureTrack);
@@ -616,7 +636,7 @@ function ReelsPortfolio() {
     const nextIndex = Math.max(0, Math.min(videoSamples.length - 1, index));
     const stickyTop = parseFloat(getComputedStyle(viewerRef.current).top) || 0;
     window.scrollTo({
-      top: window.scrollY + track.getBoundingClientRect().top - stickyTop + nextIndex * scrollStepRef.current,
+      top: window.scrollY + track.getBoundingClientRect().top - stickyTop + nextIndex * scrollStepRef.current + 1,
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
     });
   }
@@ -681,7 +701,7 @@ function ReelsPortfolio() {
                       const src = `/sample-reels-videos/${encodeURIComponent(sample.file)}`;
                       return (
                         <figure className="reel-card" key={sample.file} aria-label={`${sample.title}, reel ${index + 1} of ${videoSamples.length}`} aria-hidden={index !== activeReel} inert={index !== activeReel}>
-                          <video ref={(video) => { videoRefs.current[index] = video; }} playsInline loop muted={muted} preload="metadata" disablePictureInPicture disableRemotePlayback aria-label={sample.title} onPlay={(event) => handlePlay(event.currentTarget, index)} onPause={() => setPlayingReel((playing) => playing === index ? null : playing)} onVolumeChange={(event) => setMuted(event.currentTarget.muted)}>
+                          <video ref={(video) => { videoRefs.current[index] = video; }} playsInline loop muted={muted} preload={index === activeReel ? "auto" : "metadata"} disablePictureInPicture disableRemotePlayback aria-label={sample.title} onPlay={(event) => handlePlay(event.currentTarget, index)} onPause={() => setPlayingReel((playing) => playing === index ? null : playing)} onVolumeChange={(event) => { if (index === activeReel) setMuted(event.currentTarget.muted); }}>
                             <source src={src} type="video/mp4" />
                             Your browser does not support this video. <a href={src}>Open {sample.title}</a>.
                           </video>
@@ -704,7 +724,7 @@ function ReelsPortfolio() {
                 <div className="reel-screen-header"><span className="reel-counter" aria-live="polite" aria-atomic="true"><span className="sr-only">Reel </span>{String(activeReel + 1).padStart(2, "0")}<span aria-hidden="true"> / </span><span className="sr-only"> of </span>{String(videoSamples.length).padStart(2, "0")}</span></div>
                 <div className="reel-player-actions" role="group" aria-label="Video playback">
                   <button type="button" onClick={toggleReelPlayback} aria-label={`${isPlaying ? "Pause" : "Play"} ${activeSample.title}`} title={isPlaying ? "Pause" : "Play"} aria-controls="reel-feed">{isPlaying ? <PauseRoundedIcon className="ui-icon" /> : <PlayArrowRoundedIcon className="ui-icon" />}</button>
-                  <button type="button" onClick={() => setMuted((value) => !value)} aria-label={muted ? "Unmute reel" : "Mute reel"} title={muted ? "Turn sound on" : "Turn sound off"} aria-controls="reel-feed">{muted ? <VolumeOffRoundedIcon className="ui-icon" /> : <VolumeUpRoundedIcon className="ui-icon" />}</button>
+                  <button type="button" onClick={() => { const video = videoRefs.current[activeReel]; if (!video) return; video.muted = !video.muted; setMuted(video.muted); if (video.paused) video.play().catch(() => {}); }} aria-label={muted ? "Unmute reel" : "Mute reel"} title={muted ? "Turn sound on" : "Turn sound off"} aria-controls="reel-feed">{muted ? <VolumeOffRoundedIcon className="ui-icon" /> : <VolumeUpRoundedIcon className="ui-icon" />}</button>
                 </div>
               </div>
             </div>
