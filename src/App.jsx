@@ -109,6 +109,7 @@ const projectTabs = [
 const videoSamples = [
   { file: "Business Reel.mp4", title: "Business Reel", type: "Business content" },
   { file: "Instagram Reel - Daily Vlog.mp4", title: "Instagram Reel — Daily Vlog", type: "Lifestyle content" },
+  { file: "Food Business sample.mp4", title: "Food Business Sample", type: "Food business content" },
   { file: "Quotes 1.mp4", title: "Quotes 01", type: "Quote video" },
   { file: "Quotes 2.mp4", title: "Quotes 02", type: "Quote video" },
 ];
